@@ -2,17 +2,25 @@ const content = document.querySelector('.content')
 
 let token = ""
 
+
+// ** RUN **
+
 function run(){
     if (!token) {
         loginForm()
     } else {
-        console.log("affichage des messages")
+        fetchMessage().then(data=>{
+            messageRender(data)
+
+        })
         }
 
 }
 
+// ** LOGIN **
+
 function loginForm(){
-    console.log("1.loginForm")
+    console.log("1. loginForm")
     // 1. Creation de la Template
     let loginTemplate = `<div class="form-control">
                                      <h2>Login</h2>
@@ -36,7 +44,7 @@ function loginForm(){
 }
 
 async function fetchLogin(){
-    console.log("2.fetchLogin")
+    console.log("1.1 fetchLogin")
     const usernameLogin = document.querySelector("#usernameLogin")
     const passwordLogin = document.querySelector("#passwordLogin")
     let body = {
@@ -55,6 +63,45 @@ async function fetchLogin(){
             return token
         })
 }
+
+//-------------------------------------------------------------------
+
+// ** RENDER MESSAGE **
+
+async function fetchMessage (){
+    console.log("2. Render Fetch Message")
+    console.log(token)
+    let params = {
+        headers: {"content-type":"application/json","authorization":`Bearer ${token}`},
+        method: "GET"
+    }
+    return await fetch("https://b1messenger.imatrythis.tk/api/messages",params)
+        .then(response=>response.json())
+        .then(data=>{
+            console.log("response fetch message:")
+            console.log(data)
+            return data
+        })
+}
+
+function messageRender(messages){
+    // 2.2 messageRender
+    let messageContent = ""
+    messages.forEach((message)=>{
+        messageContent += `
+        <div class="row">
+            <p>${message.author.username} : ${message.content}</p>
+            <hr>
+        </div>`
+    })
+    console.log("2.2 MessageRender")
+    render(messageContent)
+
+}
+
+
+
+//
 
 function render(contentToRender){
     content.innerHTML = ""
