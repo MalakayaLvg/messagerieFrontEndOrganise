@@ -11,8 +11,8 @@ function run(){
     } else {
         fetchMessage().then(data=>{
             messageRender(data)
-
         })
+
         }
 
 }
@@ -95,13 +95,76 @@ function messageRender(messages){
         </div>`
     })
     console.log("2.2 MessageRender")
-    render(messageContent)
+
+    let pageContent = messageContent + sendMessageForm()
+    render(pageContent)
+
+
+    // 3. Send Message
+    console.log("3. Send Message")
+    const buttonSendMessage = document.querySelector('.buttonSendMessage')
+    const inputSendMessage = document.querySelector("#inputSendMessage")
+    buttonSendMessage.addEventListener("click",()=>{
+        console.log("3.1 fetchSendMessage")
+        fetchSendMessage(inputSendMessage.value).then(data=>{
+            console.log("responseFetchMessage:")
+            console.log(data)
+            run()
+        })
+    })
+
+
+    //4. Refresh
+
+
+
+
+
+
+}
+
+// ** SEND MESSAGE **
+
+function sendMessageForm(){
+    let template = `
+    <div class="input-group my-4">
+        <input type="text" id="inputSendMessage" >
+        <button class="btn btn-warning buttonSendMessage" id="">Envoyer</button>
+    </div>
+    `
+    return template
+}
+
+async function fetchSendMessage(textMessage){
+    let paramsBody = {"content": textMessage}
+    let params = {
+        method: "POST",
+        headers : {"content-type":"application/json","authorization":`Bearer ${token}` },
+        body : JSON.stringify(paramsBody)
+    }
+    return await fetch("https://b1messenger.imatrythis.tk/api/messages/new",params)
+        .then(response=>response.json())
+        .then(data=>{
+            return data
+        })
+}
+
+
+// ** REFRESH
+
+function refresh(){
+    let template = `
+    <div class="my-3 p-1">
+        <button class="btn btn-success" id="buttonRefresh">REFRESH</button>
+    </div>
+    `
+    return template
+
 
 }
 
 
-
-//
+//  ** RENDER
 
 function render(contentToRender){
     content.innerHTML = ""
