@@ -84,19 +84,23 @@ async function fetchMessage (){
         })
 }
 
-function messageRender(messages){
+function messageRender(messages) {
     // 2.2 messageRender
     let messageContent = ""
-    messages.forEach((message)=>{
+    messages.forEach((message) => {
         messageContent += `
-        <div class="row">
+        <div class="row" id=message${message.id}>
             <p>${message.author.username} : ${message.content}</p>
+            <div class="py-2">
+                <button class="btn btn-danger buttonDelete" id=${message.id}>Delete</button>
+                <button class="btn btn-warning buttonEdit" id=${message.id}>Edit</button>
+            </div>
             <hr>
         </div>`
     })
     console.log("2.2 MessageRender")
 
-    let pageContent = messageContent + sendMessageForm()
+    let pageContent = refreshTemplate() + messageContent + sendMessageForm()
     render(pageContent)
 
 
@@ -104,9 +108,9 @@ function messageRender(messages){
     console.log("3. Send Message")
     const buttonSendMessage = document.querySelector('.buttonSendMessage')
     const inputSendMessage = document.querySelector("#inputSendMessage")
-    buttonSendMessage.addEventListener("click",()=>{
+    buttonSendMessage.addEventListener("click", () => {
         console.log("3.1 fetchSendMessage")
-        fetchSendMessage(inputSendMessage.value).then(data=>{
+        fetchSendMessage(inputSendMessage.value).then(data => {
             console.log("responseFetchMessage:")
             console.log(data)
             run()
@@ -115,6 +119,57 @@ function messageRender(messages){
 
 
     //4. Refresh
+    console.log("4. Refresh")
+    const refreshButton = document.querySelector("#buttonRefresh")
+    refreshButton.addEventListener("click", () => {
+        console.log("click refreshButton")
+        run()
+    })
+
+    //5. Delete
+    console.log("5. Delete Message")
+    const buttonsDelete = document.querySelectorAll(".buttonDelete")
+    buttonsDelete.forEach((button) => {
+        button.addEventListener("click", () => {
+            console.log(`click button delete ${button.id}`)
+            fetchDeleteMessage(button.id).then((data) => {
+                console.log(data)
+                console.log(`message id${button.id} delete`)
+                run()
+            })
+        })
+    })
+
+
+    //5. Edit
+    console.log("6. Edit Message")
+    const buttonsEdit = document.querySelectorAll(".buttonEdit")
+    buttonsEdit.forEach((button) => {
+        button.addEventListener("click", () => {
+            console.log(`click button Edit ${button.id}`)
+            let messageDiv = document.querySelector(`#message${button.id}`)
+            console.log(messageDiv)
+
+            messageDiv.innerHTML += `
+            <div class="input-group">
+                <input type="text" id="inputEditMessage" placeholder="type new message">
+                <button class="btn btn-primary" id="buttonEditMessage">Confirmer</button>
+            </div>
+            `
+            const buttonConfirmEdit = document.querySelector("#buttonEditMessage")
+            const inputConfirmEdit = document.querySelector("#inputEditMessage")
+            buttonConfirmEdit.addEventListener("click",()=>{
+                console.log("click confirm edit")
+                fetchEditMessage(button.id,inputConfirmEdit.value).then((data)=>{
+                    console.log("message successfully edited")
+                    run()
+                })
+            })
+
+        })
+    })
+
+
 
 
 
@@ -152,7 +207,7 @@ async function fetchSendMessage(textMessage){
 
 // ** REFRESH
 
-function refresh(){
+function refreshTemplate(){
     let template = `
     <div class="my-3 p-1">
         <button class="btn btn-success" id="buttonRefresh">REFRESH</button>
@@ -160,8 +215,40 @@ function refresh(){
     `
     return template
 
-
 }
+
+// ** DELETE **
+
+async function fetchDeleteMessage(messageId)
+{
+    let params ={
+        headers: {"content-type":"application/json","authorization":`Bearer ${token}`},
+        method : "DELETE"
+    }
+    return await fetch(`https://b1messenger.imatrythis.tk/api/messages/delete/${messageId}`,params)
+        .then(response=>response.json())
+        .then(data=>{
+            return data
+        })
+}
+
+
+// ** EDIT **
+
+async function fetchEditMessage(messageId,messageContent){
+    let paramsBody = {"content": messageContent }
+    let params = {
+        headers: {"content-type":"application/json","authorization":`Bearer ${token}`},
+        method: "PUT",
+        body : JSON.stringify(paramsBody)
+    }
+    return await fetch(`https://b1messenger.imatrythis.tk/api/messages/${messageId}/edit`,params)
+        .then(response=>response.json())
+        .then(data=>{
+            return data
+        })
+}
+
 
 
 //  ** RENDER
