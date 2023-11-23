@@ -1,3 +1,5 @@
+// Doc API : https://b1messenger.imatrythis.tk/
+
 const content = document.querySelector('.content')
 
 let token = ""
@@ -56,7 +58,7 @@ async function fetchLogin(){
         headers : {"content-type":"application/json"},
         body: JSON.stringify(body)
     }
-    return await fetch("https://b1messenger.imatrythis.tk/login",params)
+    return await fetch("https://b1messenger.imatrythis.com/login",params)
         .then(response=>response.json())
         .then(data=>{
             token = data.token
@@ -75,7 +77,7 @@ async function fetchMessage (){
         headers: {"content-type":"application/json","authorization":`Bearer ${token}`},
         method: "GET"
     }
-    return await fetch("https://b1messenger.imatrythis.tk/api/messages",params)
+    return await fetch("https://b1messenger.imatrythis.com/api/messages",params)
         .then(response=>response.json())
         .then(data=>{
             console.log("response fetch message:")
@@ -94,6 +96,7 @@ function messageRender(messages) {
             <div class="py-2">
                 <button class="btn btn-danger buttonDelete" id=${message.id}>Delete</button>
                 <button class="btn btn-warning buttonEdit" id=${message.id}>Edit</button>
+                <button class="btn btn-secondary buttonResponse" id=${message.id}>Response</button>
             </div>
             <hr>
         </div>`
@@ -141,7 +144,7 @@ function messageRender(messages) {
     })
 
 
-    //5. Edit
+    //6. Edit
     console.log("6. Edit Message")
     const buttonsEdit = document.querySelectorAll(".buttonEdit")
     buttonsEdit.forEach((button) => {
@@ -168,6 +171,11 @@ function messageRender(messages) {
 
         })
     })
+
+
+    //7. Response
+    console.log("7. Response")
+
 
 
 
@@ -197,7 +205,7 @@ async function fetchSendMessage(textMessage){
         headers : {"content-type":"application/json","authorization":`Bearer ${token}` },
         body : JSON.stringify(paramsBody)
     }
-    return await fetch("https://b1messenger.imatrythis.tk/api/messages/new",params)
+    return await fetch("https://b1messenger.imatrythis.com/api/messages/new",params)
         .then(response=>response.json())
         .then(data=>{
             return data
@@ -225,7 +233,7 @@ async function fetchDeleteMessage(messageId)
         headers: {"content-type":"application/json","authorization":`Bearer ${token}`},
         method : "DELETE"
     }
-    return await fetch(`https://b1messenger.imatrythis.tk/api/messages/delete/${messageId}`,params)
+    return await fetch(`https://b1messenger.imatrythis.com/api/messages/delete/${messageId}`,params)
         .then(response=>response.json())
         .then(data=>{
             return data
@@ -242,7 +250,7 @@ async function fetchEditMessage(messageId,messageContent){
         method: "PUT",
         body : JSON.stringify(paramsBody)
     }
-    return await fetch(`https://b1messenger.imatrythis.tk/api/messages/${messageId}/edit`,params)
+    return await fetch(`https://b1messenger.imatrythis.com/api/messages/${messageId}/edit`,params)
         .then(response=>response.json())
         .then(data=>{
             return data
